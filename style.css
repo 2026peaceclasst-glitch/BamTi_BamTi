@@ -1,0 +1,386 @@
+:root {
+  color-scheme: light;
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --surface-strong: #eef3f8;
+  --ink: #152033;
+  --muted: #657083;
+  --line: #d8e0ea;
+  --primary: #2563eb;
+  --primary-dark: #1e40af;
+  --teal: #0f766e;
+  --amber: #b45309;
+  --danger: #b91c1c;
+  --shadow: 0 18px 45px rgba(21, 32, 51, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(37, 99, 235, 0.08), transparent 320px),
+    var(--bg);
+  color: var(--ink);
+  font-family:
+    "Segoe UI",
+    "Malgun Gothic",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  letter-spacing: 0;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 18px;
+}
+
+.topbar h1,
+.login-panel h2,
+.intro-panel h2,
+.view-title h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.topbar h1 {
+  font-size: clamp(24px, 3vw, 34px);
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--teal);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.app-shell {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto 48px;
+}
+
+.login-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 420px);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.intro-panel,
+.login-panel,
+.student-card,
+.student-profile {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.intro-panel {
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 36px;
+  background:
+    linear-gradient(135deg, rgba(15, 118, 110, 0.16), transparent 42%),
+    linear-gradient(45deg, rgba(180, 83, 9, 0.13), transparent 50%),
+    #ffffff;
+}
+
+.intro-panel h2 {
+  max-width: 720px;
+  font-size: clamp(30px, 5vw, 56px);
+  line-height: 1.08;
+}
+
+.intro-panel p:not(.eyebrow) {
+  max-width: 620px;
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.login-panel {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 28px;
+}
+
+.login-panel label {
+  font-weight: 800;
+}
+
+.login-panel input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--ink);
+  outline: none;
+}
+
+.login-panel input {
+  height: 46px;
+  padding: 0 14px;
+}
+
+.login-panel input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.13);
+}
+
+.form-message {
+  min-height: 22px;
+  margin: 4px 0 0;
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.primary-button,
+.ghost-button,
+.text-button {
+  min-height: 42px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  padding: 0 16px;
+  font-weight: 800;
+}
+
+.primary-button {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.primary-button:hover {
+  background: var(--primary-dark);
+}
+
+.ghost-button,
+.text-button {
+  background: #ffffff;
+  color: var(--primary-dark);
+  border-color: var(--line);
+}
+
+.ghost-button:hover,
+.text-button:hover {
+  border-color: var(--primary);
+}
+
+.view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.view-title p {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.student-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: 22px;
+}
+
+.student-profile {
+  overflow: hidden;
+}
+
+.student-photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+  background: var(--surface-strong);
+}
+
+.profile-body {
+  padding: 22px;
+}
+
+.profile-body h3 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.student-number {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  border-radius: 999px;
+  padding: 0 11px;
+  background: #e8f6f4;
+  color: #0f5d56;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.content-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.section-title h3,
+.student-card h3 {
+  margin: 0;
+}
+
+.grade-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.grade-table th,
+.grade-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.grade-table tr:last-child th,
+.grade-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.grade-table th {
+  width: 46%;
+  background: var(--surface-strong);
+}
+
+.memo-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.memo-list li {
+  border-left: 4px solid var(--amber);
+  border-radius: 6px;
+  background: #fff7ed;
+  padding: 10px 12px;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.student-card {
+  overflow: hidden;
+}
+
+.student-card .student-photo {
+  aspect-ratio: 16 / 10;
+}
+
+.student-card-body {
+  padding: 18px;
+}
+
+.student-card h3 {
+  font-size: 22px;
+}
+
+.compact-table {
+  margin-top: 14px;
+}
+
+.compact-table th,
+.compact-table td {
+  padding: 9px;
+  font-size: 14px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+@media (max-width: 860px) {
+  .login-layout,
+  .student-layout,
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .intro-panel {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .intro-panel,
+  .login-panel {
+    padding: 22px;
+  }
+
+  .view-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ghost-button {
+    width: 100%;
+  }
+}

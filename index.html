@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>학생 정보 조회</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Student Portal</p>
+        <h1>학생 정보 조회</h1>
+      </div>
+      <button id="logoutButton" class="ghost-button hidden" type="button">로그아웃</button>
+    </header>
+
+    <main id="app" class="app-shell">
+      <section id="loginView" class="login-layout" aria-labelledby="loginTitle">
+        <div class="intro-panel">
+          <p class="eyebrow">Class Information</p>
+          <h2>학생별 학습 현황을 간단하게 확인합니다.</h2>
+          <p>
+            아이디와 비밀번호로 로그인하면 학생별 성적, 학습 특성, 교사 메모를
+            한 화면에서 확인할 수 있습니다.
+          </p>
+        </div>
+
+        <form id="loginForm" class="login-panel" aria-labelledby="loginTitle">
+          <div>
+            <p class="eyebrow">Login</p>
+            <h2 id="loginTitle">로그인</h2>
+          </div>
+
+          <label for="userId">아이디</label>
+          <input
+            id="userId"
+            name="userId"
+            type="text"
+            autocomplete="username"
+            placeholder="admin 또는 10101"
+            required
+          />
+
+          <label for="password">비밀번호</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            placeholder="비밀번호"
+            required
+          />
+
+          <p id="loginMessage" class="form-message" role="alert" aria-live="polite"></p>
+          <button class="primary-button" type="submit">로그인</button>
+        </form>
+      </section>
+
+      <section id="studentView" class="hidden" aria-live="polite"></section>
+      <section id="adminView" class="hidden" aria-live="polite"></section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
