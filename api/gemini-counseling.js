@@ -66,7 +66,7 @@ ${teacherConcern}
   try {
     // Gemini REST API 호출 (내장 fetch, SDK 미사용)
     const geminiUrl =
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${apiKey}`;
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`;
 
     const geminiResponse = await fetch(geminiUrl, {
       method: "POST",
