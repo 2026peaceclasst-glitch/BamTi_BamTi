@@ -352,6 +352,272 @@ button {
   display: none !important;
 }
 
+/* ── 상담 전략 요청 버튼 ── */
+.counseling-select-btn {
+  width: 100%;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+/* ── AI 상담 전략 도우미 패널 ── */
+.counseling-panel {
+  margin-top: 40px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.counseling-panel-header {
+  padding: 28px 28px 20px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(135deg, rgba(37,99,235,0.05), transparent 60%);
+}
+
+.counseling-panel-header h2 {
+  margin: 4px 0 8px;
+  font-size: clamp(20px, 3vw, 28px);
+}
+
+.counseling-panel-desc {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* 선택된 학생 표시 영역 */
+.counseling-student-info {
+  margin: 20px 28px;
+  padding: 16px 20px;
+  border-radius: 6px;
+}
+
+.counseling-empty-state {
+  background: var(--surface-strong);
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.counseling-empty-state p {
+  margin: 0;
+}
+
+.counseling-student-selected {
+  border: 1px solid var(--primary);
+  background: rgba(37, 99, 235, 0.04);
+}
+
+.counseling-student-row {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.counseling-student-label {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.counseling-student-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.counseling-student-id {
+  margin-left: 8px;
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.counseling-student-alias {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+/* 고민 입력 */
+.counseling-input-area {
+  padding: 0 28px 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.counseling-label {
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.counseling-textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--ink);
+  padding: 12px 14px;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.counseling-textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.13);
+}
+
+/* 미리보기 */
+.counseling-preview {
+  margin: 0 28px 20px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.counseling-preview-summary {
+  padding: 10px 14px;
+  background: var(--surface-strong);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+
+.counseling-preview-summary::-webkit-details-marker { display: none; }
+.counseling-preview-summary::before { content: "▶ "; font-size: 11px; }
+details[open] .counseling-preview-summary::before { content: "▼ "; }
+
+.counseling-preview-json {
+  margin: 0;
+  padding: 14px;
+  background: #f8fafd;
+  font-size: 13px;
+  font-family: "Consolas", "D2Coding", monospace;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+  border-top: 1px solid var(--line);
+}
+
+.counseling-preview-note {
+  margin: 0;
+  padding: 8px 14px;
+  background: #fffbeb;
+  font-size: 12px;
+  color: var(--amber);
+  border-top: 1px solid var(--line);
+}
+
+/* 버튼·검증 메시지 */
+.counseling-actions {
+  padding: 0 28px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.counseling-submit-btn {
+  min-width: 180px;
+  font-size: 15px;
+}
+
+.counseling-submit-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.counseling-validation-msg {
+  margin: 0;
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* 로딩 */
+.counseling-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 28px 20px;
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.counseling-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 3px solid rgba(37, 99, 235, 0.2);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 오류 */
+.counseling-error {
+  margin: 0 28px 20px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: var(--danger);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* 결과 */
+.counseling-result {
+  margin: 0 28px 20px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.counseling-result-title {
+  margin: 0;
+  padding: 12px 18px;
+  background: var(--surface-strong);
+  font-size: 15px;
+  border-bottom: 1px solid var(--line);
+}
+
+.counseling-result-body {
+  padding: 18px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--ink);
+}
+
+/* 면책 안내 */
+.counseling-disclaimer {
+  margin: 0;
+  padding: 14px 28px;
+  background: #fffbeb;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--amber);
+  font-weight: 600;
+}
+
 @media (max-width: 860px) {
   .login-layout,
   .student-layout,
@@ -382,5 +648,29 @@ button {
 
   .ghost-button {
     width: 100%;
+  }
+
+  .counseling-panel-header,
+  .counseling-input-area,
+  .counseling-actions,
+  .counseling-loading,
+  .counseling-error,
+  .counseling-result,
+  .counseling-preview,
+  .counseling-student-info {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+
+  .counseling-panel-header {
+    padding: 20px 16px 16px;
+  }
+
+  .counseling-submit-btn {
+    width: 100%;
+  }
+
+  .counseling-student-row {
+    gap: 20px;
   }
 }

@@ -1,3 +1,13 @@
+/**
+ * [보안 안내]
+ * - 이 파일(프론트엔드)에는 Gemini API 키를 절대 넣지 마세요.
+ *   개발자 도구의 Sources/Network 탭에서 누구나 볼 수 있습니다.
+ * - Gemini API 호출은 /api/gemini-counseling (Vercel Serverless Function)에서만 처리합니다.
+ * - .env / .env.local 파일은 GitHub에 올리지 마세요.
+ * - Vercel 배포 시 Project Settings → Environment Variables 에 GEMINI_API_KEY 를 등록하세요.
+ * - Gemini에 전송하는 데이터는 학생 이름·학번·사진 경로를 제외한 최소 정보로 제한합니다.
+ */
+
 const USERS = [
   { id: "admin", password: "2026", role: "admin", name: "관리자" },
   { id: "10101", password: "1234", role: "student", studentId: "10101" },
@@ -58,6 +68,9 @@ const STUDENTS = [
     teacherMemo: "질문의 초점이 좋고, 개선 방향을 토의하는 데 적극적입니다.",
   },
 ];
+
+// 학생 인덱스 → 익명 별칭 (Gemini 전송 시 이름·학번 대신 사용)
+const STUDENT_ALIASES = ["학생 A", "학생 B", "학생 C"];
 
 const loginForm = document.querySelector("#loginForm");
 const userIdInput = document.querySelector("#userId");
@@ -159,15 +172,20 @@ function renderAdminDashboard() {
     </div>
 
     <section class="admin-grid" aria-label="전체 학생 정보">
-      ${STUDENTS.map(renderStudentCard).join("")}
+      ${STUDENTS.map((student, index) => renderStudentCard(student, index)).join("")}
     </section>
+
+    ${renderCounselingPanel()}
   `;
 
   showOnly(adminView);
   logoutButton.classList.remove("hidden");
+
+  // 상담 패널 이벤트 바인딩
+  bindCounselingPanel();
 }
 
-function renderStudentCard(student) {
+function renderStudentCard(student, index) {
   return `
     <article class="student-card">
       <img class="student-photo" src="${student.photo}" alt="${student.name} 학생 사진" />
@@ -176,6 +194,14 @@ function renderStudentCard(student) {
         <p class="student-number">학번 ${student.id}</p>
         ${renderGrades(student.grades, true, `gradesTitle-${student.id}`)}
         ${renderTraits(student)}
+        <button
+          class="counseling-select-btn primary-button"
+          type="button"
+          data-student-index="${index}"
+          aria-label="${student.name} 학생 상담 전략 요청"
+        >
+          🤖 상담 전략 요청
+        </button>
       </div>
     </article>
   `;
@@ -210,6 +236,225 @@ function renderTraits(student) {
       </ul>
     </section>
   `;
+}
+
+// ─── AI 상담 전략 도우미 패널 ─────────────────────────────────────────────
+
+function renderCounselingPanel() {
+  return `
+    <section class="counseling-panel" aria-labelledby="counselingPanelTitle">
+      <div class="counseling-panel-header">
+        <div>
+          <p class="eyebrow">AI Assistant</p>
+          <h2 id="counselingPanelTitle">AI 학생 상담 전략 도우미</h2>
+          <p class="counseling-panel-desc">학생 카드의 <strong>상담 전략 요청</strong> 버튼을 누른 뒤, 상담 고민을 입력하면 Gemini가 전략을 제안합니다.</p>
+        </div>
+      </div>
+
+      <!-- 선택된 학생 표시 -->
+      <div id="counselingStudentInfo" class="counseling-student-info counseling-empty-state" aria-live="polite">
+        <p>아직 선택된 학생이 없습니다. 위 학생 카드에서 <strong>상담 전략 요청</strong>을 눌러주세요.</p>
+      </div>
+
+      <!-- 교사 고민 입력 -->
+      <div class="counseling-input-area">
+        <label for="counselingConcern" class="counseling-label">교사 상담 고민 입력</label>
+        <textarea
+          id="counselingConcern"
+          class="counseling-textarea"
+          rows="4"
+          placeholder="예) 수업 참여는 좋은데 평가 결과가 낮습니다. 어떻게 상담하면 좋을까요?&#10;예) 과제 제출이 자주 늦습니다. 혼내기보다는 원인을 파악하고 싶은데 어떻게 접근하면 좋을까요?&#10;예) 친구들과 협업할 때 소극적인 편입니다. 어떤 질문으로 대화를 시작하면 좋을까요?"
+          aria-label="교사 상담 고민 입력"
+        ></textarea>
+      </div>
+
+      <!-- 전송 데이터 미리보기 -->
+      <details class="counseling-preview" id="counselingPreviewDetails">
+        <summary class="counseling-preview-summary">전송 데이터 미리보기 (Gemini에 실제로 전달되는 내용)</summary>
+        <pre id="counselingPreviewJson" class="counseling-preview-json">학생을 선택하고 고민을 입력하면 미리보기가 표시됩니다.</pre>
+        <p class="counseling-preview-note">⚠️ 이름, 학번, 사진 경로, 비밀번호는 전송되지 않습니다.</p>
+      </details>
+
+      <!-- 요청 버튼 -->
+      <div class="counseling-actions">
+        <button id="counselingSubmitBtn" class="primary-button counseling-submit-btn" type="button" disabled>
+          AI 상담 전략 받기
+        </button>
+        <p id="counselingValidationMsg" class="counseling-validation-msg" role="alert" aria-live="polite"></p>
+      </div>
+
+      <!-- 로딩 -->
+      <div id="counselingLoading" class="counseling-loading hidden" aria-live="polite">
+        <span class="counseling-spinner" aria-hidden="true"></span>
+        AI가 상담 전략을 생성하는 중입니다…
+      </div>
+
+      <!-- 오류 -->
+      <p id="counselingError" class="counseling-error hidden" role="alert" aria-live="polite"></p>
+
+      <!-- 결과 -->
+      <div id="counselingResult" class="counseling-result hidden" aria-live="polite">
+        <h3 class="counseling-result-title">📋 AI 상담 전략 결과</h3>
+        <div id="counselingResultBody" class="counseling-result-body"></div>
+      </div>
+
+      <!-- 면책 안내 -->
+      <p class="counseling-disclaimer">
+        ⚠️ AI 상담 전략은 참고용입니다. 최종 판단과 실제 상담은 교사가 학생의 상황을 종합적으로 고려하여 진행해야 합니다.
+      </p>
+    </section>
+  `;
+}
+
+function buildAnonymizedPayload(student, index, teacherConcern) {
+  // Gemini 전송용 익명화 데이터 생성
+  // 학생 이름·학번·사진 경로·비밀번호는 절대 포함하지 않습니다.
+  const alias = STUDENT_ALIASES[index] || `학생 ${index + 1}`;
+
+  const gradeSummary = Object.entries(student.grades)
+    .map(([k, v]) => `${k}: ${v}`)
+    .join(", ");
+
+  const learningTraits = [...student.traits, student.teacherMemo].join(" / ");
+
+  return {
+    studentAlias: alias,
+    gradeSummary,
+    learningTraits,
+    teacherConcern: teacherConcern.trim(),
+  };
+}
+
+function bindCounselingPanel() {
+  let selectedStudentIndex = null;
+
+  const studentInfoEl = document.querySelector("#counselingStudentInfo");
+  const concernTextarea = document.querySelector("#counselingConcern");
+  const previewJson = document.querySelector("#counselingPreviewJson");
+  const submitBtn = document.querySelector("#counselingSubmitBtn");
+  const validationMsg = document.querySelector("#counselingValidationMsg");
+  const loadingEl = document.querySelector("#counselingLoading");
+  const errorEl = document.querySelector("#counselingError");
+  const resultEl = document.querySelector("#counselingResult");
+  const resultBody = document.querySelector("#counselingResultBody");
+
+  // 미리보기 갱신
+  function updatePreview() {
+    if (selectedStudentIndex === null) return;
+    const concern = concernTextarea.value;
+    const payload = buildAnonymizedPayload(
+      STUDENTS[selectedStudentIndex],
+      selectedStudentIndex,
+      concern
+    );
+    previewJson.textContent = JSON.stringify(payload, null, 2);
+  }
+
+  // 학생 선택 버튼 이벤트
+  adminView.addEventListener("click", (e) => {
+    const btn = e.target.closest(".counseling-select-btn");
+    if (!btn) return;
+
+    const index = parseInt(btn.dataset.studentIndex, 10);
+    if (isNaN(index) || !STUDENTS[index]) return;
+    selectedStudentIndex = index;
+
+    const student = STUDENTS[index];
+    const alias = STUDENT_ALIASES[index] || `학생 ${index + 1}`;
+
+    // 화면용: 이름·학번 그대로 표시 / Gemini 전송용: 익명 별칭 표시
+    studentInfoEl.className = "counseling-student-info counseling-student-selected";
+    studentInfoEl.innerHTML = `
+      <div class="counseling-student-row">
+        <div>
+          <p class="counseling-student-label">선택된 학생 (화면 표시용)</p>
+          <p class="counseling-student-name">${student.name} <span class="counseling-student-id">학번 ${student.id}</span></p>
+        </div>
+        <div>
+          <p class="counseling-student-label">Gemini 전송용 (익명)</p>
+          <p class="counseling-student-alias">${alias}</p>
+        </div>
+      </div>
+    `;
+
+    submitBtn.disabled = false;
+    validationMsg.textContent = "";
+    // 결과·오류 초기화
+    resultEl.classList.add("hidden");
+    errorEl.classList.add("hidden");
+    errorEl.textContent = "";
+
+    updatePreview();
+
+    // 패널로 스크롤
+    document.querySelector(".counseling-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  // 고민 입력 → 미리보기 갱신
+  concernTextarea.addEventListener("input", updatePreview);
+
+  // 전송
+  submitBtn.addEventListener("click", async () => {
+    if (selectedStudentIndex === null) {
+      validationMsg.textContent = "먼저 학생을 선택해주세요.";
+      return;
+    }
+
+    const concern = concernTextarea.value.trim();
+    if (!concern) {
+      validationMsg.textContent = "상담 고민을 먼저 입력해주세요.";
+      concernTextarea.focus();
+      return;
+    }
+
+    validationMsg.textContent = "";
+    resultEl.classList.add("hidden");
+    errorEl.classList.add("hidden");
+    errorEl.textContent = "";
+    loadingEl.classList.remove("hidden");
+    submitBtn.disabled = true;
+
+    // Gemini 전송용 익명화 데이터만 서버로 보냄
+    // 프론트엔드는 /api/gemini-counseling 으로 POST만 전송합니다.
+    const payload = buildAnonymizedPayload(
+      STUDENTS[selectedStudentIndex],
+      selectedStudentIndex,
+      concern
+    );
+
+    try {
+      const response = await fetch("/api/gemini-counseling", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "알 수 없는 오류");
+      }
+
+      // 결과 표시 (줄바꿈 → <br>, 번호 항목 강조)
+      const formatted = data.result
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\n/g, "<br>")
+        .replace(/(^\d+\.\s.+?)(<br>|$)/gm, "<strong>$1</strong>$2");
+
+      resultBody.innerHTML = formatted;
+      resultEl.classList.remove("hidden");
+      resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch (err) {
+      errorEl.textContent =
+        "AI 상담 전략을 불러오지 못했습니다. API 키 또는 Vercel 환경 변수를 확인해주세요.";
+      errorEl.classList.remove("hidden");
+    } finally {
+      loadingEl.classList.add("hidden");
+      submitBtn.disabled = false;
+    }
+  });
 }
 
 showOnly(loginView);

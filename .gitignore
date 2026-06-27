@@ -1,0 +1,12 @@
+# 환경 변수 파일 — GitHub에 절대 올리지 마세요
+# Vercel 배포 시 Project Settings → Environment Variables 에 GEMINI_API_KEY 를 등록하세요
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
