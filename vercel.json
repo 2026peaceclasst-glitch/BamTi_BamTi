@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/gemini-counseling",
+      "destination": "/api/gemini-counseling.js"
+    }
+  ]
+}
